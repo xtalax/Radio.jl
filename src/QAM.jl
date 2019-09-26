@@ -16,9 +16,9 @@ function QAM(M::I ) where {I<:Integer}
     isinteger(sqrt(M)) || error( "sqrt(M) must be an integer value" )
     m                 = int(log2( M ))
     width             = int(sqrt(M))
-    constellation     = Array( Complex64, M )
-    grayConstellation = Array( Complex64, M )
-    bitsMap           = Array(UInt, M )
+    constellation     = Vector{ComplexF32}(undef, M)
+    grayConstellation = Vector{ComplexF32}(undef, M)
+    bitsMap           = Vector{UInt}(undef, M)
     α                 = 2/sqrt( (M-1) * 2/3 ) # scaling factor
     β                 = (-width+1)/2
 

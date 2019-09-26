@@ -10,8 +10,8 @@ abstract type CodingScheme end
 
 struct Gray <: CodingScheme end
 
-@inline encode(a::CodingScheme, n::Int) = encode(typeof(a), UInt(n))
-@inline decode(a::CodingScheme, n::Int) = encode(typeof(a), UInt(n))
+@inline encode(T::Type{<:CodingScheme}, n::Int) = encode(T, UInt(n))
+@inline decode(T::Type{<:CodingScheme}, n::Int) = encode(T, UInt(n))
 
 function encode( ::Type{Gray}, n::UInt )
     n ⊻ (n >> 1)

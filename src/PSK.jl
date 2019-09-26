@@ -7,8 +7,8 @@
 struct PSK <: Modulation
     M::Int                    # Number of symbols in the constellation
     m::Int                    # Bits per symbol
-    constellation::Vector     # Symbol constellation
-    grayConstellation::Vector # Symbol constellation with gray code
+    constellation::Vector{ComplexF32}     # Symbol constellation
+    grayConstellation::Vector{ComplexF32} # Symbol constellation with gray code
     bitsMap::Vector           # bitsMap[i] maps to constellation[i]
 end
 
@@ -18,8 +18,8 @@ function PSK( M::Integer )
     bitsMap           = [ encode( Gray, i ) for i in UInt(0):UInt(M-1) ]
     # constellation     = Complex128[ exp(Δϕ*im*i) for i in 0:M-1 ]
     # grayConstellation = Complex128[ exp(Δϕ*im*decode( Gray, i)) for i in 0:M-1 ]
-    constellation     = Array( Complex128, M )
-    grayConstellation = Array( Complex128, M )
+    constellation     = Vector{ComplexF32}(undef, M)
+    grayConstellation = Vector{ComplexF32}(undef, M)
     for i in 0:M-1
        constellation[i+1]     = exp(Δϕ*im*i)
        grayConstellation[i+1] = exp(Δϕ*im*decode( Gray, i))
@@ -37,13 +37,15 @@ end
 #                                |  | |__| |__/                                #
 ################################################################################
 
+pskmod(data::AbstractVector, M::Integer) = modulate(PSK(M), data)
+
 function modulate( psk::PSK, bits::Integer )
     psk.grayConstellation[ bits+1 ]
 end
 
 
 function modulate( psk::PSK, data::AbstractVector )
-    T = elstruct(psk.grayConstellation)
+    T = eltype(psk.grayConstellation)
     T[ modulate( psk, datum ) for datum in data ]
 end
 
