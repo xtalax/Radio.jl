@@ -2,9 +2,9 @@
 #                                ____ ____ ____                                #
 #                                |__| | __ |                                   #
 #                                |  | |__] |___                                #
-################################################################################                                     
+################################################################################
 
-type AGC
+struct AGC
     gain
     bandwidth
     alpha
@@ -22,14 +22,14 @@ function exec( agc::AGC, x::Number )
     y2           = abs2( y )
     agc.y2_prime = (1 - agc.alpha) * agc.y2_prime + agc.alpha*y2
     agc.gain *= exp( -0.5 * agc.alpha * log(agc.y2_prime))
-    
+
     return y
 end
 
-function exec{T}( agc::AGC, x::Vector{T} )
+function exec( agc::AGC, x::Vector{T} ) where T
     if ! agc.initialized
         for i in 1:min(1000, length(x))
-           exec( agc, x[i]) 
+           exec( agc, x[i])
         end
     end
     T[ exec( agc, xx) for xx in x ]

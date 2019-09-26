@@ -2,9 +2,9 @@
 #                                ___  ____ _  _                                #
 #                                |__] [__  |_/                                 #
 #                                |    ___] | \_                                #
-################################################################################                                     
+################################################################################
 
-type PSK <: Modulation
+struct PSK <: Modulation
     M::Int                    # Number of symbols in the constellation
     m::Int                    # Bits per symbol
     constellation::Vector     # Symbol constellation
@@ -15,11 +15,11 @@ end
 function PSK( M::Integer )
     ispow2( M ) || error( "M must be a power of 2" )
     Δϕ                = 2π/M
-    bitsMap           = [ encode( Gray, i ) for i in 0:M-1 ]
+    bitsMap           = [ encode( Gray, i ) for i in UInt(0):UInt(M-1) ]
     # constellation     = Complex128[ exp(Δϕ*im*i) for i in 0:M-1 ]
     # grayConstellation = Complex128[ exp(Δϕ*im*decode( Gray, i)) for i in 0:M-1 ]
     constellation     = Array( Complex128, M )
-    grayConstellation = Array( Complex128, M )   
+    grayConstellation = Array( Complex128, M )
     for i in 0:M-1
        constellation[i+1]     = exp(Δϕ*im*i)
        grayConstellation[i+1] = exp(Δϕ*im*decode( Gray, i))
@@ -35,7 +35,7 @@ end
 #                                _  _ ____ ___                                 #
 #                                |\/| |  | |  \                                #
 #                                |  | |__| |__/                                #
-################################################################################                                     
+################################################################################
 
 function modulate( psk::PSK, bits::Integer )
     psk.grayConstellation[ bits+1 ]
@@ -43,7 +43,7 @@ end
 
 
 function modulate( psk::PSK, data::AbstractVector )
-    T = eltype(psk.grayConstellation)
+    T = elstruct(psk.grayConstellation)
     T[ modulate( psk, datum ) for datum in data ]
 end
 
@@ -54,12 +54,12 @@ end
 #                           ___  ____ _  _ ____ ___                            #
 #                           |  \ |___ |\/| |  | |  \                           #
 #                           |__/ |___ |  | |__| |__/                           #
-################################################################################     
+################################################################################
 
 function demodulate( psk::PSK, symbol::Complex )
     ϕ = angle( symbol )
     ϕ = ϕ < 0 ? ϕ += 2π : ϕ
-    
+
     index = int( ϕ*psk.M / 2π ) + 1
     index = mod1( index, psk.M )
     psk.bitsMap[index]
@@ -77,7 +77,7 @@ end
 #                      ____ _  _ ____ _  _ ___  _    ____                      #
 #                      |___  \/  |__| |\/| |__] |    |___                      #
 #                      |___ _/\_ |  | |  | |    |___ |___                      #
-################################################################################     
+################################################################################
 
 #=
 
@@ -87,7 +87,7 @@ function PyPlot.plot( psk::PSK )
     fig = figure()
     scatter( real(psk.constellation), imag(psk.constellation) )
     plot( real(psk.grayConstellation), imag(psk.grayConstellation) )
-    
+
     for i in 0:psk.M-1
         symbol = psk.constellation[ i + 1 ]
         x      = real( symbol )
@@ -96,11 +96,11 @@ function PyPlot.plot( psk::PSK )
 
         annotate( bin(bits, psk.m ), (x, y+0.05), ha="center" )
     end
-    
+
     setp( axes(), aspect = 1  )
     xlabel( "In Phase" )
     ylabel( "Quadrature" )
-    
+
     return fig
 end
 
@@ -114,4 +114,4 @@ demodData = demodulate( psk, symbols )
 
 Test.@test_approx_eq modData demodData
 
-=# 
+=#

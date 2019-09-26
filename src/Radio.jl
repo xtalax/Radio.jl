@@ -1,10 +1,8 @@
 module Radio
 
-VERSION < v"0.4-" && using Docile
-
 import DSP: FIRFilter, filt
 
-abstract Modulation
+abstract type Modulation end
 
 include( "AGC.jl" )
 include( "coding.jl" )

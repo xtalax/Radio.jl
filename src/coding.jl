@@ -1,4 +1,4 @@
-abstract CodingScheme
+abstract type CodingScheme end
 
 
 
@@ -6,24 +6,42 @@ abstract CodingScheme
 #               ____ _  _ ____ ____ ___  _ _  _ ____                           #
 #               |___ |\ | |    |  | |  \ | |\ | | __                           #
 #               |___ | \| |___ |__| |__/ | | \| |__]                           #
-################################################################################                                     
-                                     
-type Gray <: CodingScheme end
+################################################################################
 
+struct Gray <: CodingScheme end
 
-function encode( ::Type{Gray}, n::Integer )
-    n $ (n >> 1)
+@inline encode(a::CodingScheme, n::Int) = encode(typeof(a), UInt(n))
+@inline decode(a::CodingScheme, n::Int) = encode(typeof(a), UInt(n))
+
+function encode( ::Type{Gray}, n::UInt )
+    n ⊻ (n >> 1)
+end
+
+#=
+function decode( ::Type{Gray}, n::UInt )
+    mask = n >> 1
+    while mask != 0
+        n = n ⊻ mask
+        mask = mask >> 1
+    end
+    return n
+end
+=#
+function decode( ::Type{Gray}, n::UInt32) #Faster alg for 32 bit ints, see: https://en.wikipedia.org/wiki/Gray_code
+    for shift in (16, 8, 4, 2, 1)
+        n = n ⊻ (n >> shift);
+    end
+   return n
+end
+
+function decode( ::Type{Gray}, n::UInt64) #Faster alg for 64 bit ints, loop should unroll
+    for shift in (32, 16, 8, 4, 2, 1)
+        n = n ⊻ (n >> shift);
+    end
+   return n
 end
 
 
-function decode( ::Type{Gray}, n::Integer )
-    p = n
-     while (n >>= 1) != 0
-         p $= n
-     end
-     return p
-end
 
-
-encode{T<:CodingScheme}( ::Type{T}, N::AbstractVector ) = [ encode( T, n) for n in N ]
-decode{T<:CodingScheme}( ::Type{T}, N::AbstractVector ) = [ decode( T, n) for n in N ]
+encode(::Type{T}, N::AbstractVector ) where T= [ encode( T, n) for n in N ]
+decode(::Type{T}, N::AbstractVector ) where T= [ decode( T, n) for n in N ]

@@ -1,0 +1,8 @@
+name = "Radio"
+uuid = "35420fd7-bef1-481d-8929-5e5e411a6cc0"
+authors = ["xtalax <alex.lemony@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
+Winston = "bd07be1c-e76f-5ff0-9c0b-f51ef45303c6"

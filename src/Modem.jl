@@ -2,9 +2,9 @@
 #                           _  _ ____ ___  ____ _  _                           #
 #                           |\/| |  | |  \ |___ |\/|                           #
 #                           |  | |__| |__/ |___ |  |                           #
-################################################################################                                     
+################################################################################
 
-type Modem
+struct Modem
     modulation::Modulation
     samplesPerSymbol::Real
     txFilter::FIRFilter
@@ -18,9 +18,9 @@ function Modem( modulation::Modulation; samplesPerSymbol::Real = 2, pulseShape =
     numTaps    = 32 * 10 * samplesPerSymbol
     span       = int( numTaps/samplesPerSymbol )
     taps       = pulseShape( excessBandwidth, span, samplesPerSymbol )
-    txFilter   = FIRFilter( taps, resampRate )  
-    rxFilter   = FIRFilter( taps, 1/resampRate )  
-    
+    txFilter   = FIRFilter( taps, resampRate )
+    rxFilter   = FIRFilter( taps, 1/resampRate )
+
     Modem( modulation, samplesPerSymbol, txFilter, rxFilter )
 end
 
