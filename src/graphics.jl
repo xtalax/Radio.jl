@@ -1,15 +1,13 @@
 import Winston
-import DSP
-
 #==============================================================================#
 #                 Plot Filter's Impulse & Frequency Response                   #
 #==============================================================================#
 # x = vector containing a filter's impulse response
-# 
+#
 # Example:
 #    plot_response( firdes(0.5, kaiser(37, 5.653) ))
 # See example 7.8 in DTSP
-    
+
 function freqz( coefficients::Vector )
     if !method_exists( Winston.plot, ())
         error( "To use plot_response, you must load the Winston package")
@@ -22,7 +20,7 @@ function freqz( coefficients::Vector )
     X  = abs(X)
     X  = 20*log10( X )
     f  = linspace( 0, 1, 512 )
-    
+
     impulse = Winston.stem( M,
                             x,
                             title  = "Impulse Response",
@@ -30,15 +28,15 @@ function freqz( coefficients::Vector )
                             ylabel = "Amplitude"
                           )
     Winston.setattr(impulse.frame1, draw_grid=true)
-    
-    freq = Winston.FramedPlot( 
+
+    freq = Winston.FramedPlot(
                             title  = "Frequency Response",
                             xlabel = "f/f_{Nyquist}",
                             ylabel = "dB"
                         )
     Winston.add(freq, Winston.Curve(f, X))
-    Winston.setattr(freq.frame1, draw_grid=true)                    
-    
+    Winston.setattr(freq.frame1, draw_grid=true)
+
     t = Winston.Table(2, 1)
     t[1,1] = impulse
     t[2,1] = freq
@@ -67,19 +65,22 @@ end
 #                                Plot Spectrum                                 #
 #==============================================================================#
 
-function plot_spectrum( signal::Vector, sample_rate::Real = 1.0 )
-    spectrum = DSP.periodogram( signal )
-    spectrum = 10*log10( spectrum.^2 ) 
-    spectrum = fftshift( spectrum )
-    
-    frequencies = linspace( -sample_rate/2, sample_rate/2, length(spectrum) )
-    
-    spectrum_plot = Winston.FramedPlot( 
+
+function plot_spectrum( signal::Vector, sample_rate::Real = 1.0, fraction::Real = 1.0)
+    @assert fraction <= 1 "Fraction must be less than 1, got $fraction"
+    spectrum = DSP.periodogram(signal, fs = sample_rate)
+    spectrum = FFTW.fftshift( spectrum )
+
+    power = spectrum.power
+    frequency = freq(spectrum)
+    mid = div(length(power),2)
+    eighth = floor(Int, length(power)*fraction)
+    spectrum_plot = Winston.FramedPlot(
                             title  = "Spectrum",
                             xlabel = "frequency",
                             ylabel = "dB"
                         )
-    Winston.add(spectrum_plot, Winston.Curve( frequencies, spectrum ))
-    
+    Winston.add(spectrum_plot, Winston.Curve( frequency[mid-eighth+1:mid+eighth],  10 .*log10.(power[mid-eighth+1:mid+eighth])))
+
     return spectrum_plot
 end

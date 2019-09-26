@@ -14,8 +14,8 @@ end
 
 function QAM(M::I ) where {I<:Integer}
     isinteger(sqrt(M)) || error( "sqrt(M) must be an integer value" )
-    m                 = int(log2( M ))
-    width             = int(sqrt(M))
+    m                 = Int(log2( M ))
+    width             = Int(sqrt(M))
     constellation     = Vector{ComplexF32}(undef, M)
     grayConstellation = Vector{ComplexF32}(undef, M)
     bitsMap           = Vector{UInt}(undef, M)
@@ -26,7 +26,7 @@ function QAM(M::I ) where {I<:Integer}
 
     for idx in 0:M-1
         inPhase                    = idx >> div( m, 2 )
-        quadrature                 = idx & int(exp2(m/2)-1)
+        quadrature                 = idx & Int(exp2(m/2)-1)
         constellation[idx + 1]     = α * Complex( inPhase+β, quadrature+β )
         bitsMap[idx + 1]           = (encode(Gray, inPhase) << div( m, 2 )) | encode(Gray, quadrature)
         inPhase                    = decode(Gray, inPhase)
@@ -70,8 +70,8 @@ end
 
 function demodulate( modem::QAM, symbol::Complex )
     symbol     = symbol / modem.α
-    inPhase    = int( real( symbol ) - modem.β )
-    quadrature = int( imag( symbol ) - modem.β )
+    inPhase    = Int( real( symbol ) - modem.β )
+    quadrature = Int( imag( symbol ) - modem.β )
     bits       = ( inPhase << div( modem.m, 2 )) | quadrature
     bits       = clamp( bits, 0, modem.M-1 )
     bits       = modem.bitsMap[bits+1]

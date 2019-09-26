@@ -1,6 +1,6 @@
 module Radio
-
-import DSP: FIRFilter, filt
+using Revise
+using DSP, FFTW
 
 abstract type Modulation end
 
@@ -12,8 +12,9 @@ include( "QAM.jl" )
 include( "raised_cosine.jl" )
 include( "modem.jl" )
 include( "noise.jl" )
-include("complex_z_transform.jl")
-include( "graphics.jl")
+include( "complex_z_transform.jl" )
+include( "graphics.jl" )
+include( "utils.jl" )
 
 
 export
@@ -25,5 +26,7 @@ export
     modulate,
     demodulate,
     pskmod,
-    wgn
+    wgn,
+    bandwidth
+export plot_constellation, freqz, plot_spectrum
 end # Radio module

@@ -13,7 +13,7 @@ struct Gray <: CodingScheme end
 @inline encode(T::Type{<:CodingScheme}, n::Int) = encode(T, UInt(n))
 @inline decode(T::Type{<:CodingScheme}, n::Int) = encode(T, UInt(n))
 
-function encode( ::Type{Gray}, n::UInt )
+function encode( ::Type{Gray}, n::Union{UInt64, UInt32, UInt8})
     n ⊻ (n >> 1)
 end
 
@@ -27,6 +27,15 @@ function decode( ::Type{Gray}, n::UInt )
     return n
 end
 =#
+
+function decode( ::Type{Gray}, n::UInt8) #Faster alg for 32 bit ints, see: https://en.wikipedia.org/wiki/Gray_code
+    for shift in (4, 2, 1)
+        n = n ⊻ (n >> shift);
+    end
+   return n
+end
+
+
 function decode( ::Type{Gray}, n::UInt32) #Faster alg for 32 bit ints, see: https://en.wikipedia.org/wiki/Gray_code
     for shift in (16, 8, 4, 2, 1)
         n = n ⊻ (n >> shift);

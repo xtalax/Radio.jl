@@ -10,7 +10,7 @@ plot_filename = "CZT Resampling.png"
 data = rand( 0:mod_order-2, symbol_count )
 
 # generate 1e3 random QPSK symbols
-symbols = Radio.pskmod( data, 4 )
+symbols = pskmod( data, 4 )
 
 # generate root-cosine nyquist filter coefficients
 nyq_coef = Radio.rcos(0.35, 4 .* interp_ratio, interp_ratio)
@@ -20,7 +20,7 @@ nyq_coef = nyq_coef ./ sum( nyq_coef )
 symbols_interp = Radio.interpolate( symbols, interp_ratio, nyq_coef )
 
 # create some gaussian noise and add it to interpolated symbols
-noise  = Radio.wgn( length( symbols_interp ), 0, "dBm", 1.0, true )
+noise  = wgn( length( symbols ); power=10, units="dBm", impedence=1.0, returnComplex=true )
 signal = symbols_interp .+ noise
 
 constellation_base = Radio.plot_constellation( symbols )
@@ -53,7 +53,7 @@ W  = exp(-im*2*pi*(f2-f1)/(m*fs))
 A  = exp(im*2*pi*f1/fs)
 
 spectrum_czt = Radio.czt( signal, m, W, A )
-# spectrum_czt = Radio.czt( signal, length(signal)) 
+# spectrum_czt = Radio.czt( signal, length(signal))
 signal_decim = ifft( fftshift(spectrum_czt) )[interp_ratio*4:end]
 
 
@@ -73,4 +73,3 @@ t[3,2] = spectrum_decim
 
 Winston.display( t )
 Winston.file( t, joinpath( dirname(Base.source_path()), plot_filename ) )
-

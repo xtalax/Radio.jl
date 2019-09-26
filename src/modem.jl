@@ -14,9 +14,9 @@ end
 
 function Modem( modulation::Modulation; samplesPerSymbol::Real = 2, pulseShape = rrcos, excessBandwidth = 0.35 )
     samplesPerSymbol >= 2 || error( "samplesPerSymbol must be greater than 2" )
-    resampRate = isinteger( samplesPerSymbol ) ? int( samplesPerSymbol )//1 : samplesPerSymbol
+    resampRate = isinteger( samplesPerSymbol ) ? Int( samplesPerSymbol )//1 : samplesPerSymbol
     numTaps    = 32 * 10 * samplesPerSymbol
-    span       = int( numTaps/samplesPerSymbol )
+    span       = Int( numTaps/samplesPerSymbol )
     taps       = pulseShape( excessBandwidth, span, samplesPerSymbol )
     txFilter   = FIRFilter( taps, resampRate )
     rxFilter   = FIRFilter( taps, 1/resampRate )

@@ -7,9 +7,9 @@
 
 function rcos(β, span, sps )
     # TODO: add argument valdiation
-    hlen = int(sps*span)
+    hlen = Int(sps*span)
     hlen = iseven(hlen) ? hlen+1 : hlen
-    h    = Array( Float64, hlen )
+    h    = Vector{Float64}(undef, hlen )
 
     for i = 1:hlen
         t = i - 1 - (hlen - 1)/2
@@ -32,9 +32,9 @@ end
 
 function rrcos( β, span, sps )
     # TODO: add argument valdiation
-    hlen = int(sps*span)
+    hlen = Int(sps*span)
     hlen = iseven(hlen) ? hlen+1 : hlen
-    h    = Array( Float64, hlen )
+    h    = Vector{Float64}(undef, hlen )
 
     for i = 1:hlen
         t = i - (hlen - 1)/2 - 1

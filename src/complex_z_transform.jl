@@ -25,7 +25,7 @@ function czt(x::Vector{ComplexF64}, m::Int, w::ComplexF64, a::ComplexF64)
     fg = fft(fg)
 
     fw = zeros(ComplexF64, nfft)
-    fw[1:length(NM)] = 1./W2[NM]
+    fw[1:length(NM)] = 1 ./W2[NM]
     fw = fft(fw)
     gg = ifft(fg.*fw)
 
